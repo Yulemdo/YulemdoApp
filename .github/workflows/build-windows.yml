@@ -1,0 +1,45 @@
+name: Build Windows (exe)
+
+on:
+  workflow_dispatch:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Ikonka tayyorlash
+        shell: bash
+        run: |
+          mkdir -p apps/desktop/build
+          cp icon-512.png apps/desktop/build/icon.png
+
+      - name: Kutubxonalarni o'rnatish
+        working-directory: apps/desktop
+        run: npm install
+
+      - name: exe yig'ish
+        working-directory: apps/desktop
+        run: npm run dist
+
+      - name: Faylni yuklab olish uchun saqlash
+        uses: actions/upload-artifact@v4
+        with:
+          name: Yulemdo-Windows
+          path: apps/desktop/dist/*.exe
+
+      - name: Release'ga qo'shish (faqat v* tag bilan)
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: apps/desktop/dist/*.exe
