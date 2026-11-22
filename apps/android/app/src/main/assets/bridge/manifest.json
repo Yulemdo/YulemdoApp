@@ -1,0 +1,21 @@
+{
+  "manifest_version": 2,
+  "name": "Yulemdo Bridge",
+  "version": "1.0.0",
+  "description": "Kun/tun rejimini sahifa bilan ilova o'rtasida xavfsiz uzatadi.",
+  "permissions": ["nativeMessaging", "tabs", "<all_urls>"],
+  "applications": {
+    "gecko": { "id": "yulemdo-bridge@yulemdo.uz" }
+  },
+  "browser_specific_settings": {
+    "gecko": { "id": "yulemdo-bridge@yulemdo.uz" }
+  },
+  "background": { "scripts": ["bg.js"] },
+  "content_scripts": [
+    {
+      "matches": ["*://yulemdo.uz/*", "*://*.yulemdo.uz/*"],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ]
+}

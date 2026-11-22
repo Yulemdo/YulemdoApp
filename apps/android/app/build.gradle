@@ -1,0 +1,29 @@
+plugins {
+    id 'com.android.application'
+}
+android {
+    namespace 'uz.yulemdo.browser'
+    compileSdk 36
+    defaultConfig {
+        applicationId 'uz.yulemdo.browser'
+        minSdk 26
+        targetSdk 34
+        versionCode 1
+        versionName '1.0.0'
+        // apk hajmini kamaytirish: faqat telefon arxitekturalari
+        ndk { abiFilters 'arm64-v8a', 'armeabi-v7a' }
+    }
+    buildTypes {
+        release { minifyEnabled false }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+}
+dependencies {
+    // Gecko dvigateli (Firefox). Versiya: Mozilla Maven'dagi barqaror (release) kanal.
+    implementation 'org.mozilla.geckoview:geckoview:150.0.20260511200624'
+    // FileProvider (yuklamalarni ochish uchun) va RoleManager/boshqa AndroidX yordamchilari
+    implementation 'androidx.core:core:1.13.1'
+}
