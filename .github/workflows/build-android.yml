@@ -1,0 +1,58 @@
+name: Build Android (apk)
+
+on:
+  workflow_dispatch:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Repo tuzilmasini tekshirish
+        run: |
+          echo "--- repo ildizi ---"
+          ls -la
+          echo "--- apps/android ---"
+          ls -la apps/android || true
+          echo "--- apps/android/app ---"
+          ls -la apps/android/app || true
+
+      - name: Ikonka tayyorlash
+        run: |
+          if [ ! -f icon-512.png ]; then
+            echo "XATO: icon-512.png repo ildizida topilmadi"
+            exit 1
+          fi
+          mkdir -p apps/android/app/src/main/res/mipmap-xxxhdpi
+          cp icon-512.png apps/android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png
+
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: 8.11.1
+
+      - name: apk yig'ish (debug imzo bilan, telefonga o'rnatsa bo'ladi)
+        working-directory: apps/android
+        run: gradle assembleDebug --no-daemon --stacktrace
+
+      - name: Faylni yuklab olish uchun saqlash
+        uses: actions/upload-artifact@v4
+        with:
+          name: Yulemdo-Android
+          path: apps/android/app/build/outputs/apk/debug/*.apk
+
+      - name: Release'ga qo'shish (faqat v* tag bilan)
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: apps/android/app/build/outputs/apk/debug/*.apk
